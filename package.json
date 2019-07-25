@@ -1,0 +1,33 @@
+{
+  "name": "asynchronous-tools",
+  "version": "1.0.0",
+  "description": "Asynchronous tools.",
+  "main": "dist/asynchronous-tools.js",
+  "types": "dist/asynchronous-tools.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prod": "rollup -c rollup.config.js",
+    "example": "rollup -c example/rollup.config.js",
+    "lint": "tslint 'src/**/*.{ts,tsx}'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TwilightOwl/asynchronous-tools"
+  },
+  "author": "Denis Zhelnerovich",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "rollup": "^0.64.1",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.5",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-typescript": "^0.8.1",
+    "ts-jest": "^24.0.2",
+    "tslib": "^1.9.3",
+    "typescript": "^3.0.1"
+  }
+}
