@@ -1,6 +1,6 @@
-import queue, { OnRejection } from '.';
+import queue, { OnRejection } from '.'
 
-const pause = (timeout = 1000) => new Promise(resolve => setTimeout(resolve, timeout))
+const pause = (timeout = 100) => new Promise(resolve => setTimeout(resolve, timeout))
 const resolve = (value: number) => () => value
 const reject = (value: number) => () => { throw `Error: ${value}` }
 const getUniqueID = () => `${Date.now()}-${Math.random()}`
