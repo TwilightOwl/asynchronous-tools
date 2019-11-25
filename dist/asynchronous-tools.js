@@ -294,5 +294,61 @@ var aiMethod = function (target, key, value) { return ({
     }
 }); };
 
-export { queue, aiWithAsyncInit, aiInit, aiMethod };
+/**
+ * @overview utility to prevent several function calls at the same time
+ * @author Denis Zhelnerovich
+ * @version 1.0
+ */
+var singular = function (func, params) {
+    if (params === void 0) { params = {}; }
+    var _a = params.onStatusChanged, onStatusChanged = _a === void 0 ? function () { } : _a, _b = params.onFailure, onFailure = _b === void 0 ? function () { } : _b, _c = params.enabled, enabled = _c === void 0 ? true : _c;
+    var setEnabled = function (value) {
+        enabled = value;
+        onStatusChanged(enabled);
+        return false;
+    };
+    var release = function () { return setEnabled(true); };
+    var resultFunction = (function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return enabled
+            ? setEnabled(false) || func.apply(void 0, [release].concat(args))
+            : onFailure();
+    });
+    //I've added following properties just for future use cases
+    resultFunction.release = release;
+    resultFunction.function = func;
+    resultFunction.setOnStatusChanged = function (handler) { return (onStatusChanged = handler); };
+    resultFunction.setOnFailure = function (handler) { return (onFailure = handler); };
+    return resultFunction;
+};
+
+var _handlers = {};
+var subscribe = function (event, handler) {
+    var queue = _handlers[event] || (_handlers[event] = []);
+    queue.push(handler);
+    var isSubscribed = true;
+    return function () {
+        if (!isSubscribed)
+            return;
+        var index = queue.indexOf(handler);
+        if (~index)
+            queue.splice(index, 1);
+        isSubscribed = false;
+    };
+};
+var invokeHandlers = function (event) {
+    var args = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        args[_i - 1] = arguments[_i];
+    }
+    // сделал здесь новый массив, т.к. при двух хэндлерах с одним ивентом, если первый отпишет себя то в _handlers[event] собъются индексы и второй хэндлер не вызовется
+    var handlers = (_handlers[event] || []).slice();
+    //TODO: make it configurable, wait for async result
+    handlers.forEach(function (handler) { return handler.apply(void 0, args); });
+};
+
+export { queue, OnRejection, singular, aiWithAsyncInit, aiInit, aiMethod, subscribe, invokeHandlers };
 //# sourceMappingURL=asynchronous-tools.js.map
