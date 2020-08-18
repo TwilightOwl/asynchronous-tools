@@ -350,5 +350,46 @@ var invokeHandlers = function (event) {
     handlers.forEach(function (handler) { return handler.apply(void 0, args); });
 };
 
-export { queue, OnRejection, singular, aiWithAsyncInit, aiInit, aiMethod, subscribe, invokeHandlers };
+var _this$1 = undefined;
+var cancelKey = Symbol('canceled');
+var cancelable = function (originalPromise) {
+    var cancel;
+    var cancelPromise = new Promise(function (resolve) {
+        cancel = function (data) {
+            var _a;
+            return resolve((_a = { data: data }, _a[cancelKey] = true, _a.canceled = true, _a));
+        };
+    });
+    var promise = new Promise(function (resolve, reject) { return __awaiter(_this$1, void 0, void 0, function () {
+        var result, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, Promise.race([originalPromise, cancelPromise])];
+                case 1:
+                    result = _a.sent();
+                    if (result && result[cancelKey]) {
+                        resolve(result);
+                    }
+                    else {
+                        resolve(result);
+                        cancel('Stop cancelPromise');
+                    }
+                    return [3 /*break*/, 3];
+                case 2:
+                    e_1 = _a.sent();
+                    reject(e_1);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); });
+    return { cancel: cancel, promise: promise };
+};
+var isCanceled = function (result) {
+    return result[cancelKey];
+};
+
+export { queue, OnRejection, singular, cancelable, isCanceled, aiWithAsyncInit, aiInit, aiMethod, subscribe, invokeHandlers };
 //# sourceMappingURL=asynchronous-tools.js.map
